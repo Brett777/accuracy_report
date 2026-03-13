@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat \"C:/Users/BrettOlmstead/PycharmProjects/Repliers Prediction Demo/report/.gitignore\" 2>/dev/null; echo \"EXIT:$?\")",
+      "Bash(cd \"C:/Users/BrettOlmstead/PycharmProjects/Repliers Prediction Demo/report\" && gh repo create brett777/accuracy_report --public --confirm 2>&1 || gh repo create brett777/accuracy_report --public 2>&1)"
+    ]
+  }
+}
