@@ -9,7 +9,7 @@ interface Props {
   properties: PropertyResult[];
 }
 
-type SortKey = 'listingId' | 'city' | 'board' | 'subType' | 'closePrice' | 'offMarketQualityErr' | 'offMarketNoQualityErr' | 'compEstimateErr' | 'sqft' | 'beds' | 'closeDate';
+type SortKey = 'listingId' | 'city' | 'board' | 'subType' | 'closePrice' | 'offMarketQualityErr' | 'offMarketNoQualityErr' | 'compEstimateErr' | 'sqft' | 'beds' | 'baths' | 'quality' | 'closeDate';
 
 const PAGE_SIZE_OPTIONS = [25, 50, 100, 250];
 
@@ -36,6 +36,8 @@ export function PropertyDetailTable({ properties }: Props) {
         case 'compEstimateErr': va = a.errors.compEstimate?.pct ?? -1; vb = b.errors.compEstimate?.pct ?? -1; break;
         case 'sqft': va = a.sqft ?? 0; vb = b.sqft ?? 0; break;
         case 'beds': va = a.bedrooms ?? 0; vb = b.bedrooms ?? 0; break;
+        case 'baths': va = a.bathrooms ?? 0; vb = b.bathrooms ?? 0; break;
+        case 'quality': va = a.overallQuality ?? 0; vb = b.overallQuality ?? 0; break;
         case 'closeDate': va = a.closeDate; vb = b.closeDate; break;
       }
 
@@ -96,12 +98,14 @@ export function PropertyDetailTable({ properties }: Props) {
             <thead>
               <tr className="border-b">
                 <SortHeader label="Listing" k="listingId" />
+                <SortHeader label="Close Date" k="closeDate" />
                 <SortHeader label="City" k="city" />
                 <SortHeader label="Board" k="board" />
                 <SortHeader label="Type" k="subType" />
                 <SortHeader label="Sqft" k="sqft" />
                 <SortHeader label="Beds" k="beds" />
-                <SortHeader label="Close Date" k="closeDate" />
+                <SortHeader label="Baths" k="baths" />
+                <SortHeader label="Quality" k="quality" />
                 <SortHeader label="Close Price" k="closePrice" />
                 <SortHeader label="Comp Est" k="compEstimateErr" />
                 <SortHeader label="Off-Mkt (Quality)" k="offMarketQualityErr" />
@@ -112,12 +116,14 @@ export function PropertyDetailTable({ properties }: Props) {
               {pageData.map(p => (
                 <tr key={p.listingId} className="border-b border-border/30 hover:bg-accent/30">
                   <td className="py-1.5 px-2 font-mono">{p.listingId}</td>
+                  <td className="py-1.5 px-2">{p.closeDate ? formatDate(p.closeDate) : '-'}</td>
                   <td className="py-1.5 px-2">{p.city ?? '-'}</td>
                   <td className="py-1.5 px-2">{p.board}</td>
                   <td className="py-1.5 px-2">{p.propertySubType ?? '-'}</td>
                   <td className="py-1.5 px-2 font-mono">{p.sqft?.toLocaleString() ?? '-'}</td>
                   <td className="py-1.5 px-2 font-mono">{p.bedrooms ?? '-'}</td>
-                  <td className="py-1.5 px-2">{p.closeDate ? formatDate(p.closeDate) : '-'}</td>
+                  <td className="py-1.5 px-2 font-mono">{p.bathrooms ?? '-'}</td>
+                  <td className="py-1.5 px-2 font-mono">{p.overallQuality !== null ? p.overallQuality.toFixed(2) : '-'}</td>
                   <td className="py-1.5 px-2 font-mono">{formatCurrency(p.closePrice)}</td>
                   {predCell(p, 'compEstimate')}
                   {predCell(p, 'offMarketQuality')}
