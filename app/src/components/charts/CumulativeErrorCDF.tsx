@@ -11,7 +11,7 @@ import {
   Filler,
 } from 'chart.js';
 import type { PropertyResult, ModelKey } from '../../types';
-import { MODEL_KEYS, MODEL_LABELS } from '../../types';
+import { CHART_MODEL_KEYS, MODEL_LABELS } from '../../types';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { ChartContainer } from './ChartContainer';
 import { zoomOptions } from './zoomConfig';
@@ -38,7 +38,7 @@ export function CumulativeErrorCDF({ properties }: Props) {
     // X-axis: error % thresholds from 0 to 50
     const thresholds = Array.from({ length: 51 }, (_, i) => i);
 
-    const datasets = MODEL_KEYS.map(key => {
+    const datasets = CHART_MODEL_KEYS.map(key => {
       const errors = properties
         .filter(p => p.errors[key] !== null)
         .map(p => p.errors[key]!.pct);
@@ -92,6 +92,7 @@ export function CumulativeErrorCDF({ properties }: Props) {
             }}
           />
         </ChartContainer>
+        <p className="text-xs text-muted-foreground mt-3">Shows the cumulative percentage of predictions falling within each error threshold. A steeper curve means more predictions are accurate at lower thresholds. Use this to answer questions like "what percentage of predictions are within 10% of actual?"</p>
       </CardContent>
     </Card>
   );

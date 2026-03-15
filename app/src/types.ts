@@ -62,6 +62,14 @@ export const MODEL_KEYS: ModelKey[] = [
   'compEstimate',
 ];
 
+/** Model keys used in charts (excludes compEstimate) */
+export const CHART_MODEL_KEYS: ModelKey[] = [
+  'offMarketQuality',
+  'offMarketNoQuality',
+  'onMarketQuality',
+  'onMarketNoQuality',
+];
+
 /** Grouped model keys for side-by-side comparison */
 export const MODEL_GROUPS: { label: string; keys: ModelKey[] }[] = [
   { label: 'Off-Market Models', keys: ['offMarketQuality', 'offMarketNoQuality'] },

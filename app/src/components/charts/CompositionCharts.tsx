@@ -30,8 +30,10 @@ function countBy(items: (string | null)[]): Map<string, number> {
 export function CompositionCharts({ properties }: Props) {
   const subTypeRef = useRef<any>(null);
   const cityRef = useRef<any>(null);
+  const boardRef = useRef<any>(null);
   const resetSubType = useCallback(() => { subTypeRef.current?.resetZoom(); }, []);
   const resetCity = useCallback(() => { cityRef.current?.resetZoom(); }, []);
+  const resetBoard = useCallback(() => { boardRef.current?.resetZoom(); }, []);
   const subTypeData = useMemo(() => {
     const counts = countBy(properties.map(p => p.propertySubType));
     const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]);
@@ -49,14 +51,25 @@ export function CompositionCharts({ properties }: Props) {
     const counts = countBy(properties.map(p => p.city));
     const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]);
     const top15 = sorted.slice(0, 15);
-    const otherCount = sorted.slice(15).reduce((s, c) => s + c[1], 0);
-    if (otherCount > 0) top15.push(['Other', otherCount]);
     return {
       labels: top15.map(s => s[0]),
       datasets: [{
         label: 'Count',
         data: top15.map(s => s[1]),
         backgroundColor: 'rgba(59,130,246,0.6)',
+      }],
+    };
+  }, [properties]);
+
+  const boardData = useMemo(() => {
+    const counts = countBy(properties.map(p => p.board ?? null));
+    const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+    return {
+      labels: sorted.map(s => s[0]),
+      datasets: [{
+        label: 'Count',
+        data: sorted.map(s => s[1]),
+        backgroundColor: 'rgba(234,179,8,0.6)',
       }],
     };
   }, [properties]);
@@ -69,7 +82,7 @@ export function CompositionCharts({ properties }: Props) {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-base">Properties by Type</CardTitle>
@@ -78,6 +91,7 @@ export function CompositionCharts({ properties }: Props) {
           <ChartContainer height={Math.max(200, subTypeData.labels.length * 30)} onResetZoom={resetSubType}>
             <Bar ref={subTypeRef} data={subTypeData} options={barOpts} />
           </ChartContainer>
+          <p className="text-xs text-muted-foreground mt-3">Breakdown of properties in the dataset by sub-type (e.g., Detached, Condo, Semi-Detached). Shows the sample size behind each property type's accuracy metrics.</p>
         </CardContent>
       </Card>
       <Card>
@@ -88,6 +102,18 @@ export function CompositionCharts({ properties }: Props) {
           <ChartContainer height={Math.max(200, cityData.labels.length * 30)} onResetZoom={resetCity}>
             <Bar ref={cityRef} data={cityData} options={barOpts} />
           </ChartContainer>
+          <p className="text-xs text-muted-foreground mt-3">Shows the geographic distribution of evaluated properties. Cities beyond the top 15 are grouped into "Other." Helps assess whether results are driven by a few dominant markets.</p>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Properties by Board</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ChartContainer height={Math.max(200, boardData.labels.length * 30)} onResetZoom={resetBoard}>
+            <Bar ref={boardRef} data={boardData} options={barOpts} />
+          </ChartContainer>
+          <p className="text-xs text-muted-foreground mt-3">Distribution of properties by MLS board. Reveals which real estate boards contribute the most data and helps contextualize accuracy across different regional markets.</p>
         </CardContent>
       </Card>
     </div>

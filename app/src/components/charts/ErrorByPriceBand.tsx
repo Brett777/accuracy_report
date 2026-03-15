@@ -9,7 +9,7 @@ import {
   Legend,
 } from 'chart.js';
 import type { PropertyResult, ModelKey } from '../../types';
-import { MODEL_KEYS, MODEL_LABELS, PRICE_BANDS } from '../../types';
+import { CHART_MODEL_KEYS, MODEL_LABELS, PRICE_BANDS } from '../../types';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { ChartContainer } from './ChartContainer';
 import { zoomOptions } from './zoomConfig';
@@ -33,13 +33,14 @@ function median(arr: number[]): number {
 
 interface Props {
   properties: PropertyResult[];
+  yMax?: number;
 }
 
-export function ErrorByPriceBand({ properties }: Props) {
+export function ErrorByPriceBand({ properties, yMax }: Props) {
   const chartRef = useRef<any>(null);
   const resetZoom = useCallback(() => { chartRef.current?.resetZoom(); }, []);
   const data = useMemo(() => {
-    const datasets = MODEL_KEYS.map(key => ({
+    const datasets = CHART_MODEL_KEYS.map(key => ({
       label: MODEL_LABELS[key],
       backgroundColor: MODEL_COLORS[key],
       data: PRICE_BANDS.map(band => {
@@ -57,7 +58,7 @@ export function ErrorByPriceBand({ properties }: Props) {
         <CardTitle className="text-base">Median Error % by Price Band</CardTitle>
       </CardHeader>
       <CardContent>
-        <ChartContainer onResetZoom={resetZoom}>
+        <ChartContainer height={350} onResetZoom={resetZoom}>
           <Bar
             ref={chartRef}
             data={data}
@@ -66,7 +67,7 @@ export function ErrorByPriceBand({ properties }: Props) {
               maintainAspectRatio: false,
               scales: {
                 x: { title: { display: true, text: 'Price Band' } },
-                y: { title: { display: true, text: 'Median Error %' } },
+                y: { title: { display: true, text: 'Median Error %' }, max: yMax },
               },
               plugins: {
                 legend: { position: 'bottom' as const, labels: { boxWidth: 12, font: { size: 11 } } },
@@ -75,6 +76,7 @@ export function ErrorByPriceBand({ properties }: Props) {
             }}
           />
         </ChartContainer>
+        <p className="text-xs text-muted-foreground mt-3">Median error by price range. Identifies which segments are hardest to predict.</p>
       </CardContent>
     </Card>
   );

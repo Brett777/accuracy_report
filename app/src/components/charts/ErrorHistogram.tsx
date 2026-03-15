@@ -9,7 +9,7 @@ import {
   Legend,
 } from 'chart.js';
 import type { PropertyResult, ModelKey } from '../../types';
-import { MODEL_KEYS, MODEL_LABELS } from '../../types';
+import { CHART_MODEL_KEYS, MODEL_LABELS } from '../../types';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { ChartContainer } from './ChartContainer';
@@ -64,7 +64,7 @@ export function ErrorHistogram({ properties }: Props) {
       <CardHeader className="pb-2">
         <CardTitle className="text-base">Signed Error Distribution</CardTitle>
         <div className="flex flex-wrap gap-1 no-print">
-          {MODEL_KEYS.map(key => (
+          {CHART_MODEL_KEYS.map(key => (
             <Button
               key={key}
               size="sm"
@@ -94,6 +94,7 @@ export function ErrorHistogram({ properties }: Props) {
             }}
           />
         </ChartContainer>
+        <p className="text-xs text-muted-foreground mt-3">Shows the distribution of signed prediction errors. Negative values mean under-prediction, positive means over-prediction. A well-calibrated model centers around 0% with a narrow spread. Reveals bias direction and how often predictions miss by large margins.</p>
       </CardContent>
     </Card>
   );

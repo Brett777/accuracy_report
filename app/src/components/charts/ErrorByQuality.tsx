@@ -36,45 +36,41 @@ interface Props {
   yMax?: number;
 }
 
-export function ErrorByPropertyType({ properties, yMax }: Props) {
+export function ErrorByQuality({ properties, yMax }: Props) {
   const chartRef = useRef<any>(null);
   const resetZoom = useCallback(() => { chartRef.current?.resetZoom(); }, []);
 
   const data = useMemo(() => {
-    // Get property types sorted by count
-    const typeCounts = new Map<string, number>();
+    // Bucket overallQuality into integer scores, sorted ascending
+    const qualityCounts = new Map<string, number>();
     for (const p of properties) {
-      const t = p.propertySubType ?? 'Unknown';
-      typeCounts.set(t, (typeCounts.get(t) ?? 0) + 1);
+      if (p.overallQuality === null) continue;
+      const label = String(Math.round(p.overallQuality));
+      qualityCounts.set(label, (qualityCounts.get(label) ?? 0) + 1);
     }
-    const LABEL_MAP: Record<string, string> = {
-      'Single Family Residence': 'Single Family',
-      'Manufactured Home': 'Mfg Home',
-      'Unimproved Land': 'Vacant Land',
-    };
-    const types = [...typeCounts.entries()]
-      .filter(([, count]) => count >= 5)
-      .sort((a, b) => b[1] - a[1])
-      .map(([type]) => type);
+    const qualities = [...qualityCounts.entries()]
+      .filter(([, count]) => count >= 3)
+      .sort((a, b) => Number(a[0]) - Number(b[0]))
+      .map(([q]) => q);
 
     const datasets = CHART_MODEL_KEYS.map(key => ({
       label: MODEL_LABELS[key],
       backgroundColor: MODEL_COLORS[key],
-      data: types.map(type => {
+      data: qualities.map(q => {
         const props = properties.filter(
-          p => (p.propertySubType ?? 'Unknown') === type && p.errors[key] !== null
+          p => p.overallQuality !== null && String(Math.round(p.overallQuality)) === q && p.errors[key] !== null
         );
         return median(props.map(p => p.errors[key]!.pct));
       }),
     }));
 
-    return { labels: types.map(t => LABEL_MAP[t] ?? t), datasets };
+    return { labels: qualities, datasets };
   }, [properties]);
 
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-base">Median Error % by Property Type</CardTitle>
+        <CardTitle className="text-base">Median Error % by Quality Score</CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer height={350} onResetZoom={resetZoom}>
@@ -86,7 +82,7 @@ export function ErrorByPropertyType({ properties, yMax }: Props) {
               maintainAspectRatio: false,
               animation: false as const,
               scales: {
-                x: { title: { display: true, text: 'Property Type' } },
+                x: { title: { display: true, text: 'Overall Quality Score' } },
                 y: { title: { display: true, text: 'Median Error %' }, max: yMax },
               },
               plugins: {
@@ -96,7 +92,7 @@ export function ErrorByPropertyType({ properties, yMax }: Props) {
             }}
           />
         </ChartContainer>
-        <p className="text-xs text-muted-foreground mt-3">Median error by property sub-type. Types with fewer than 5 properties excluded.</p>
+        <p className="text-xs text-muted-foreground mt-3">Median error by image-derived quality score (1-6). Scores with fewer than 3 properties excluded.</p>
       </CardContent>
     </Card>
   );

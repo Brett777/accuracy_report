@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useCallback } from 'react';
+import { useMemo, useRef, useCallback } from 'react';
 import { Scatter } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -9,9 +9,8 @@ import {
 } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import type { PropertyResult, ModelKey } from '../../types';
-import { MODEL_KEYS, MODEL_LABELS } from '../../types';
+import { CHART_MODEL_KEYS, MODEL_LABELS } from '../../types';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
 import { formatCurrency } from '../../lib/format';
 import { ChartContainer } from './ChartContainer';
 import { zoomOptions } from './zoomConfig';
@@ -31,29 +30,24 @@ interface Props {
 }
 
 export function ResidualScatter({ properties }: Props) {
-  const [activeModel, setActiveModel] = useState<ModelKey>('offMarketQuality');
   const chartRef = useRef<any>(null);
   const resetZoom = useCallback(() => { chartRef.current?.resetZoom(); }, []);
 
-  const data = useMemo(() => {
-    const points = properties
-      .filter(p => p.errors[activeModel] !== null)
-      .map(p => ({
-        x: p.closePrice,
-        y: p.errors[activeModel]!.signedPct,
-        listingId: p.listingId,
-      }));
-
-    return {
-      datasets: [{
-        label: MODEL_LABELS[activeModel],
-        data: points,
-        backgroundColor: MODEL_COLORS[activeModel],
-        pointRadius: 3,
-        pointHoverRadius: 6,
-      }],
-    };
-  }, [properties, activeModel]);
+  const data = useMemo(() => ({
+    datasets: CHART_MODEL_KEYS.map(key => ({
+      label: MODEL_LABELS[key],
+      data: properties
+        .filter(p => p.errors[key] !== null)
+        .map(p => ({
+          x: p.closePrice,
+          y: p.errors[key]!.signedPct,
+          listingId: p.listingId,
+        })),
+      backgroundColor: MODEL_COLORS[key],
+      pointRadius: 3,
+      pointHoverRadius: 6,
+    })),
+  }), [properties]);
 
   const options = useMemo(() => ({
     responsive: true,
@@ -74,6 +68,7 @@ export function ResidualScatter({ properties }: Props) {
           label: (ctx: any) => {
             const pt = ctx.raw as any;
             return [
+              `${ctx.dataset.label}`,
               `Listing: ${pt.listingId}`,
               `Price: ${formatCurrency(pt.x)}`,
               `Error: ${pt.y > 0 ? '+' : ''}${pt.y.toFixed(1)}%`,
@@ -93,7 +88,7 @@ export function ResidualScatter({ properties }: Props) {
           },
         },
       },
-      legend: { display: false },
+      legend: { position: 'bottom' as const, labels: { boxWidth: 12, font: { size: 11 } } },
       zoom: zoomOptions,
     },
   }), []);
@@ -102,24 +97,12 @@ export function ResidualScatter({ properties }: Props) {
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-base">Residuals vs. Price</CardTitle>
-        <div className="flex flex-wrap gap-1 no-print">
-          {MODEL_KEYS.map(key => (
-            <Button
-              key={key}
-              size="sm"
-              variant={activeModel === key ? 'default' : 'outline'}
-              onClick={() => setActiveModel(key)}
-              className="text-xs h-7"
-            >
-              {MODEL_LABELS[key]}
-            </Button>
-          ))}
-        </div>
       </CardHeader>
       <CardContent>
         <ChartContainer onResetZoom={resetZoom}>
           <Scatter ref={chartRef} data={data} options={options as any} />
         </ChartContainer>
+        <p className="text-xs text-muted-foreground mt-3">Plots each property's signed error percentage against its close price. Points above zero indicate over-prediction, below zero under-prediction. The dashed line marks zero error. Helps detect price-dependent bias -- e.g., if the model consistently over-predicts expensive properties.</p>
       </CardContent>
     </Card>
   );

@@ -9,7 +9,7 @@ import {
 } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import type { PropertyResult, ModelKey } from '../../types';
-import { MODEL_KEYS, MODEL_LABELS } from '../../types';
+import { CHART_MODEL_KEYS, MODEL_LABELS } from '../../types';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
 import { formatCurrency } from '../../lib/format';
@@ -39,7 +39,7 @@ export function ScatterPlot({ properties }: Props) {
     let max = 100000;
     for (const p of properties) {
       if (p.closePrice > max) max = p.closePrice;
-      for (const key of MODEL_KEYS) {
+      for (const key of CHART_MODEL_KEYS) {
         const pred = p.predictions[key];
         if (pred !== null && pred > max) max = pred;
       }
@@ -132,7 +132,7 @@ export function ScatterPlot({ properties }: Props) {
       <CardHeader className="pb-2">
         <CardTitle className="text-base">Predicted vs Actual</CardTitle>
         <div className="flex flex-wrap gap-1 no-print">
-          {MODEL_KEYS.map(key => (
+          {CHART_MODEL_KEYS.map(key => (
             <Button
               key={key}
               size="sm"
@@ -149,6 +149,7 @@ export function ScatterPlot({ properties }: Props) {
         <ChartContainer onResetZoom={resetZoom}>
           <Scatter ref={chartRef} data={data} options={options as any} />
         </ChartContainer>
+        <p className="text-xs text-muted-foreground mt-3">Plots each property's predicted value against its actual close price. Points on the dashed diagonal line represent perfect predictions. Color indicates error severity: green (&lt;5%), yellow (5-10%), red (&gt;10%). Helps identify systematic over/under-prediction and outliers.</p>
       </CardContent>
     </Card>
   );
