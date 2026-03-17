@@ -1,6 +1,6 @@
 # Model Performance Report
 
-An interactive accuracy report for DataRobot property valuation models. Queries recently sold properties from a MySQL database, runs predictions through multiple DataRobot deployments, and renders a React dashboard comparing model performance.
+An interactive accuracy report for Prophaic / Repliers property valuation models. Queries recently sold properties from a MySQL database, runs predictions through multiple DataRobot deployments, and renders a React dashboard comparing model performance.
 
 ## Quick Start
 

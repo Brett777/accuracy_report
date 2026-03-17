@@ -56,7 +56,16 @@ export function ResidualScatter({ properties }: Props) {
     scales: {
       x: {
         title: { display: true, text: 'Close Price' },
-        ticks: { callback: (v: number | string) => formatCurrency(Number(v)) },
+        ticks: {
+          callback: (v: number | string) => {
+            const n = Number(v);
+            if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
+            if (n >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
+            return `$${n}`;
+          },
+          maxRotation: 45,
+          minRotation: 45,
+        },
       },
       y: {
         title: { display: true, text: 'Signed Error %' },

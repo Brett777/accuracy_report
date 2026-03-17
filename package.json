@@ -5,14 +5,17 @@
   "scripts": {
     "setup": "npm install && cd app && npm install",
     "generate": "tsx scripts/generate.ts",
+    "generate:7d": "tsx scripts/generate.ts --days 7",
     "generate:30d": "tsx scripts/generate.ts --days 30",
     "generate:90d": "tsx scripts/generate.ts --days 90",
     "dev": "cd app && npm run dev",
     "build": "cd app && npm run build",
     "start": "tsx scripts/generate.ts && cd app && npm run dev",
+    "start:7d": "tsx scripts/generate.ts --days 7 && cd app && npm run dev",
     "start:30d": "tsx scripts/generate.ts --days 30 && cd app && npm run dev",
     "start:90d": "tsx scripts/generate.ts --days 90 && cd app && npm run dev",
-    "preview": "cd app && npm run preview"
+    "preview": "cd app && npm run preview",
+    "leaderboard-test": "tsx scripts/leaderboard-test.ts"
   },
   "dependencies": {
     "dotenv": "^16.4.7",

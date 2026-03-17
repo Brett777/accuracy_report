@@ -97,6 +97,8 @@ export default function App() {
           activeFilterCount={report.activeFilterCount}
           onUpdate={report.updateFilter}
           onReset={report.resetFilters}
+          filteredProperties={report.filteredProperties}
+          meta={report.data!.meta}
         />
         <MetricsSummary metrics={report.metrics} />
 

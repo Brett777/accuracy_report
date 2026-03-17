@@ -127,26 +127,28 @@ export function ScatterPlot({ properties }: Props) {
     },
   }), [maxVal]);
 
+  const modelButtons = CHART_MODEL_KEYS.map(key => (
+    <Button
+      key={key}
+      size="sm"
+      variant={activeModel === key ? 'default' : 'outline'}
+      onClick={() => setActiveModel(key)}
+      className="text-xs h-7"
+    >
+      {MODEL_LABELS[key]}
+    </Button>
+  ));
+
   return (
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-base">Predicted vs Actual</CardTitle>
         <div className="flex flex-wrap gap-1 no-print">
-          {CHART_MODEL_KEYS.map(key => (
-            <Button
-              key={key}
-              size="sm"
-              variant={activeModel === key ? 'default' : 'outline'}
-              onClick={() => setActiveModel(key)}
-              className="text-xs h-7"
-            >
-              {MODEL_LABELS[key]}
-            </Button>
-          ))}
+          {modelButtons}
         </div>
       </CardHeader>
       <CardContent>
-        <ChartContainer onResetZoom={resetZoom}>
+        <ChartContainer onResetZoom={resetZoom} toolbar={modelButtons}>
           <Scatter ref={chartRef} data={data} options={options as any} />
         </ChartContainer>
         <p className="text-xs text-muted-foreground mt-3">Plots each property's predicted value against its actual close price. Points on the dashed diagonal line represent perfect predictions. Color indicates error severity: green (&lt;5%), yellow (5-10%), red (&gt;10%). Helps identify systematic over/under-prediction and outliers.</p>

@@ -21,9 +21,17 @@ const BATCH_SIZE = 500;
 
 // ── CLI args ──────────────────────────────────────────────────────────
 
+function getMostRecentSunday(): string {
+  const now = new Date();
+  const day = now.getDay(); // 0 = Sunday
+  const sunday = new Date(now);
+  sunday.setDate(now.getDate() - day);
+  return sunday.toISOString().slice(0, 10);
+}
+
 function parseArgs() {
   const args = process.argv.slice(2);
-  let days = 7;
+  let days: number | null = null;
   let from: string | null = null;
   let to: string | null = null;
   let output = resolve(__dirname, '../app/public/data/report.json');
@@ -38,7 +46,10 @@ function parseArgs() {
   }
 
   const toDate = to ?? new Date().toISOString().slice(0, 10);
-  const fromDate = from ?? new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
+  const fromDate = from
+    ?? (days !== null
+      ? new Date(Date.now() - days * 86400000).toISOString().slice(0, 10)
+      : getMostRecentSunday());
 
   return { from: fromDate, to: toDate, output };
 }
@@ -64,6 +75,16 @@ function computeErrors(predicted: number | null, actual: number): ErrorMetrics |
   const signedPct = (signed / actual) * 100;
   const pct = Math.abs(signedPct);
   return { absolute, pct, signed, signedPct };
+}
+
+// ── Clean feature row for JSON serialization ─────────────────────────
+
+function cleanRow(row: DRPredictionRow): Record<string, string | number | null> {
+  const cleaned: Record<string, string | number | null> = {};
+  for (const [k, v] of Object.entries(row)) {
+    cleaned[k] = v === undefined ? null : v;
+  }
+  return cleaned;
 }
 
 // ── Days since list ───────────────────────────────────────────────────
@@ -253,6 +274,12 @@ async function main() {
       predictions,
       errors,
       priceBand: getPriceBand(closePrice),
+      rawFeatures: {
+        onMarketQuality: cleanRow(onMarketQualityRows[i]),
+        offMarketQuality: cleanRow(offMarketQualityRows[i]),
+        onMarketNoQuality: cleanRow(onMarketNoQualityRows[i]),
+        offMarketNoQuality: cleanRow(offMarketNoQualityRows[i]),
+      },
     });
   }
 

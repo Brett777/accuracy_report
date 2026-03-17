@@ -4,9 +4,10 @@ interface Props {
   children: ReactNode;
   height?: number | string;
   onResetZoom?: () => void;
+  toolbar?: ReactNode;
 }
 
-export function ChartContainer({ children, height = 400, onResetZoom }: Props) {
+export function ChartContainer({ children, height = 400, onResetZoom, toolbar }: Props) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -60,6 +61,11 @@ export function ChartContainer({ children, height = 400, onResetZoom }: Props) {
           )}
         </button>
       </div>
+      {isFullscreen && toolbar && (
+        <div className="flex flex-wrap gap-1 mb-3 no-print">
+          {toolbar}
+        </div>
+      )}
       <div className={isFullscreen ? 'flex-1 min-h-0' : 'h-full'}>
         {children}
       </div>

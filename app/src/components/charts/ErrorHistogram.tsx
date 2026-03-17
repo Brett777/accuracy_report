@@ -59,26 +59,28 @@ export function ErrorHistogram({ properties }: Props) {
     }],
   }), [properties, activeModel]);
 
+  const modelButtons = CHART_MODEL_KEYS.map(key => (
+    <Button
+      key={key}
+      size="sm"
+      variant={activeModel === key ? 'default' : 'outline'}
+      onClick={() => setActiveModel(key)}
+      className="text-xs h-7"
+    >
+      {MODEL_LABELS[key]}
+    </Button>
+  ));
+
   return (
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-base">Signed Error Distribution</CardTitle>
         <div className="flex flex-wrap gap-1 no-print">
-          {CHART_MODEL_KEYS.map(key => (
-            <Button
-              key={key}
-              size="sm"
-              variant={activeModel === key ? 'default' : 'outline'}
-              onClick={() => setActiveModel(key)}
-              className="text-xs h-7"
-            >
-              {MODEL_LABELS[key]}
-            </Button>
-          ))}
+          {modelButtons}
         </div>
       </CardHeader>
       <CardContent>
-        <ChartContainer onResetZoom={resetZoom}>
+        <ChartContainer onResetZoom={resetZoom} toolbar={modelButtons}>
           <Bar
             ref={chartRef}
             data={data}

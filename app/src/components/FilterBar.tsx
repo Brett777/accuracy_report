@@ -1,8 +1,11 @@
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
+import { CalendarPicker } from './ui/calendar-picker';
 import type { FilterState } from '../lib/filters';
+import type { PropertyResult, ReportData } from '../types';
 import { PRICE_BANDS } from '../types';
-import { X } from 'lucide-react';
+import { generateCSV, downloadCSV } from '../lib/csvExport';
+import { X, Download } from 'lucide-react';
 
 interface Props {
   filters: FilterState;
@@ -15,6 +18,8 @@ interface Props {
   activeFilterCount: number;
   onUpdate: <K extends keyof FilterState>(key: K, value: FilterState[K]) => void;
   onReset: () => void;
+  filteredProperties: PropertyResult[];
+  meta: ReportData['meta'];
 }
 
 function MultiSelect({
@@ -48,7 +53,16 @@ function MultiSelect({
   );
 }
 
-export function FilterBar({ filters, filterOptions, activeFilterCount, onUpdate, onReset }: Props) {
+export function FilterBar({ filters, filterOptions, activeFilterCount, onUpdate, onReset, filteredProperties, meta }: Props) {
+  const hasRawFeatures = filteredProperties.some(p => p.rawFeatures != null);
+
+  function handleExport() {
+    const csv = generateCSV(filteredProperties);
+    const dateRange = `${meta.dateRange.from}_${meta.dateRange.to}`;
+    const filename = `external_test_${dateRange}_${filteredProperties.length}props.csv`;
+    downloadCSV(csv, filename);
+  }
+
   return (
     <div className="no-print flex flex-wrap items-end gap-4 p-4 rounded-lg border bg-card">
       <MultiSelect
@@ -76,30 +90,29 @@ export function FilterBar({ filters, filterOptions, activeFilterCount, onUpdate,
         onChange={v => onUpdate('priceBands', v)}
       />
 
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-muted-foreground">Close Date From</label>
-        <input
-          type="date"
-          className="h-9 rounded-md border border-input bg-background px-3 text-sm"
-          value={filters.closeDateFrom}
-          onChange={e => onUpdate('closeDateFrom', e.target.value)}
-        />
-      </div>
-      <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-muted-foreground">Close Date To</label>
-        <input
-          type="date"
-          className="h-9 rounded-md border border-input bg-background px-3 text-sm"
-          value={filters.closeDateTo}
-          onChange={e => onUpdate('closeDateTo', e.target.value)}
-        />
-      </div>
+      <CalendarPicker
+        label="Close Date From"
+        value={filters.closeDateFrom}
+        onChange={v => onUpdate('closeDateFrom', v)}
+      />
+      <CalendarPicker
+        label="Close Date To"
+        value={filters.closeDateTo}
+        onChange={v => onUpdate('closeDateTo', v)}
+      />
 
       {activeFilterCount > 0 && (
         <Button variant="ghost" size="sm" onClick={onReset} className="gap-1">
           <X className="h-3 w-3" />
           Reset
           <Badge variant="secondary" className="ml-1">{activeFilterCount}</Badge>
+        </Button>
+      )}
+
+      {hasRawFeatures && (
+        <Button variant="outline" size="sm" onClick={handleExport} className="ml-auto gap-1.5">
+          <Download className="h-3.5 w-3.5" />
+          Export CSV
         </Button>
       )}
     </div>

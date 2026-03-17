@@ -97,10 +97,10 @@ export function PropertyDetailTable({ properties }: Props) {
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b">
+                <SortHeader label="Board" k="board" />
                 <SortHeader label="Listing" k="listingId" />
                 <SortHeader label="Close Date" k="closeDate" />
                 <SortHeader label="City" k="city" />
-                <SortHeader label="Board" k="board" />
                 <SortHeader label="Type" k="subType" />
                 <SortHeader label="Sqft" k="sqft" />
                 <SortHeader label="Beds" k="beds" />
@@ -115,10 +115,10 @@ export function PropertyDetailTable({ properties }: Props) {
             <tbody>
               {pageData.map(p => (
                 <tr key={p.listingId} className="border-b border-border/30 hover:bg-accent/30">
+                  <td className="py-1.5 px-2">{p.board}</td>
                   <td className="py-1.5 px-2 font-mono">{p.listingId}</td>
                   <td className="py-1.5 px-2">{p.closeDate ? formatDate(p.closeDate) : '-'}</td>
                   <td className="py-1.5 px-2">{p.city ?? '-'}</td>
-                  <td className="py-1.5 px-2">{p.board}</td>
                   <td className="py-1.5 px-2">{p.propertySubType ?? '-'}</td>
                   <td className="py-1.5 px-2 font-mono">{p.sqft?.toLocaleString() ?? '-'}</td>
                   <td className="py-1.5 px-2 font-mono">{p.bedrooms ?? '-'}</td>

@@ -25,6 +25,8 @@ export interface PropertyResult {
   predictions: Record<ModelKey, number | null>;
   errors: Record<ModelKey, ErrorMetrics | null>;
   priceBand: string;
+  /** Raw feature rows as sent to DataRobot, keyed by model */
+  rawFeatures?: Partial<Record<Exclude<ModelKey, 'compEstimate'>, Record<string, string | number | null>>>;
 }
 
 export interface ReportData {
@@ -44,6 +46,12 @@ export interface ModelMetrics {
   count: number;
   pctWithin10: number;
   p95ErrorPct: number;
+  meanError: number;
+  rmse: number;
+  pctWithin5: number;
+  pctWithin20: number;
+  medianSignedPct: number;
+  stdErrorPct: number;
 }
 
 export const MODEL_LABELS: Record<ModelKey, string> = {
