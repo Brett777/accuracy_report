@@ -21,12 +21,19 @@ const BATCH_SIZE = 500;
 
 // ── CLI args ──────────────────────────────────────────────────────────
 
+function toLocalDateStr(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 function getMostRecentSunday(): string {
   const now = new Date();
   const day = now.getDay(); // 0 = Sunday
   const sunday = new Date(now);
   sunday.setDate(now.getDate() - day);
-  return sunday.toISOString().slice(0, 10);
+  return toLocalDateStr(sunday);
 }
 
 function parseArgs() {
@@ -45,10 +52,10 @@ function parseArgs() {
     }
   }
 
-  const toDate = to ?? new Date().toISOString().slice(0, 10);
+  const toDate = to ?? toLocalDateStr(new Date());
   const fromDate = from
     ?? (days !== null
-      ? new Date(Date.now() - days * 86400000).toISOString().slice(0, 10)
+      ? toLocalDateStr(new Date(Date.now() - days * 86400000))
       : getMostRecentSunday());
 
   return { from: fromDate, to: toDate, output };

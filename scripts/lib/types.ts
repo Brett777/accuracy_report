@@ -102,6 +102,8 @@ export interface WeightedCompEstimateInput {
   ListingContractDate: string;
   ClosePrice?: number;
   StreetName?: string;
+  LotSizeSquareFeet?: number;
+  OriginatingSystemName?: string;
 }
 
 export interface WeightedCompEstimateResult {

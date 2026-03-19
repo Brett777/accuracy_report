@@ -278,5 +278,7 @@ export function toCompInput(row: DbPropertyRow): WeightedCompEstimateInput {
       : new Date().toISOString().split('T')[0],
     // Do NOT pass ClosePrice — at inference time, the subject property has no close price.
     StreetName: row.StreetName || undefined,
+    LotSizeSquareFeet: parseNumericValue(row.LotSizeSquareFeet) ?? undefined,
+    OriginatingSystemName: row.OriginatingSystemName || undefined,
   };
 }
